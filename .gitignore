@@ -19,3 +19,5 @@
 
 # Go workspace file
 go.work
+
+enocean/ptm216b/example/example
