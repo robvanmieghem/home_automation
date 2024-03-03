@@ -7,11 +7,11 @@ import (
 
 	"github.com/go-ble/ble"
 	"github.com/go-ble/ble/darwin"
-	"github.com/robvanmieghem/home_automation/enocean/ptm216b"
+	"github.com/robvanmieghem/home_automation/enocean/ptmb"
 )
 
 func AdvertisementHandler(advertisement ble.Advertisement) {
-	event, err := ptm216b.NewEvent(advertisement)
+	event, err := ptmb.NewEvent(advertisement)
 	if err != nil {
 		log.Fatal(err)
 	}

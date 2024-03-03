@@ -1,4 +1,9 @@
-package ptm216b
+// Package ptmb provides a go interace for EnOcean ptm21xb ble advertisement frames
+// User manual of the module:
+// https://www.enocean.com/wp-content/uploads/downloads-produkte/en/products/enocean_modules_24ghz_ble/ptm-216b/user-manual-pdf/PTM-216B-User-Manual-3.pdf
+// Compatible modules:
+// - ptm215b
+package ptmb
 
 import (
 	"bytes"
@@ -41,7 +46,7 @@ type Event struct {
 	Sequence uint32
 }
 
-// NewEvent creates a ptm216b Event from a ble Advertisement
+// NewEvent creates a ptmb Event from a ble Advertisement
 // If the Advertisement is not an enocean event, nil is returned and no error
 func NewEvent(advertisement ble.Advertisement) (event *Event, err error) {
 	rawManufacturerData := advertisement.ManufacturerData()
