@@ -13,6 +13,7 @@ const (
 	COMMAND_GET_GROUPS          = 10
 	COMMAND_GET_GROUPS_RESPONSE = 11
 	COMMAND_SET_STATUS          = 12
+	COMMAND_SET_STATUS_RESPONSE = 13
 )
 
 var (
@@ -46,6 +47,18 @@ func NewLoginCommand(user, password string) *Command {
 
 func NewGetGroupsCommand() *Command {
 	return &Command{Type: COMMAND_GET_GROUPS}
+}
+
+func NewSetStatusCommand(channelID int, status []int) *Command {
+	return &Command{
+		Type: COMMAND_SET_STATUS,
+		Value: struct {
+			Chnl int
+			Val  []int
+		}{
+			Chnl: channelID,
+			Val:  status},
+	}
 }
 
 type Response struct {
@@ -108,6 +121,7 @@ func (r *Response) GetLoginResponse() (sessionID string, err error) {
 	sessionID = responseValue.Id
 	return
 }
+
 func (r *Response) GetGroupsResponse() (groups []Group, err error) {
 	if err = r.Error(); err != nil {
 		return
@@ -122,5 +136,24 @@ func (r *Response) GetGroupsResponse() (groups []Group, err error) {
 		return
 	}
 	groups = responseValue.Groups
+	return
+}
+
+func (r *Response) SetStatusResponse() (channelID int, status []int, err error) {
+	if err = r.Error(); err != nil {
+		return
+	}
+	if r.Type != COMMAND_SET_STATUS_RESPONSE {
+		err = fmt.Errorf("Response Type %d is not a SetStatus Response", r.Type)
+	}
+	responseValue := &struct {
+		Chnl int
+		Val  []int
+	}{}
+	if err = json.Unmarshal(r.Value, responseValue); err != nil {
+		return
+	}
+	channelID = responseValue.Chnl
+	status = responseValue.Val
 	return
 }
