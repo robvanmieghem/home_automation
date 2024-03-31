@@ -53,12 +53,17 @@ func (c *Client) Login() (err error) {
 	}
 
 	defer resp.Body.Close()
-	loginResponse := LoginResponse{}
-	if err = json.NewDecoder(resp.Body).Decode(&loginResponse); err != nil {
+	result := Response{}
+
+	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return
 	}
-	jar.SetCookies(resp.Request.URL, []*http.Cookie{{Name: "i", Value: loginResponse.Value.Id}})
-	return err
+	sessionId, err := result.GetLoginResponse()
+	if err != nil {
+		return
+	}
+	jar.SetCookies(resp.Request.URL, []*http.Cookie{{Name: "i", Value: sessionId}})
+	return
 }
 
 func (c *Client) GetGroups() (groups []Group, err error) {

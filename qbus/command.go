@@ -27,16 +27,13 @@ var (
 	ErrUndefined              = errors.New("Undefined error in the controller. Please try again later")
 )
 
-type LoginCommand struct {
+type Command struct {
 	Type  int
-	Value struct {
-		Usr string
-		Psw string
-	}
+	Value any
 }
 
-func NewLoginCommand(user, password string) *LoginCommand {
-	return &LoginCommand{
+func NewLoginCommand(user, password string) *Command {
+	return &Command{
 		Type: COMMAND_LOGIN,
 		Value: struct {
 			Usr string
@@ -45,19 +42,6 @@ func NewLoginCommand(user, password string) *LoginCommand {
 			Usr: user,
 			Psw: password},
 	}
-}
-
-type LoginResponse struct {
-	Type  int
-	Value struct {
-		Rsp bool
-		Id  string
-	}
-}
-
-type Command struct {
-	Type  int
-	Value any
 }
 
 func NewGetGroupsCommand() *Command {
@@ -107,6 +91,23 @@ func (r *Response) Error() (err error) {
 	return
 }
 
+func (r *Response) GetLoginResponse() (sessionID string, err error) {
+	if err = r.Error(); err != nil {
+		return
+	}
+	if r.Type != COMMAND_LOGIN_RESPONSE {
+		err = fmt.Errorf("Response Type %d is not a Login Response", r.Type)
+	}
+	responseValue := &struct {
+		Rsp bool
+		Id  string
+	}{}
+	if err = json.Unmarshal(r.Value, responseValue); err != nil {
+		return
+	}
+	sessionID = responseValue.Id
+	return
+}
 func (r *Response) GetGroupsResponse() (groups []Group, err error) {
 	if err = r.Error(); err != nil {
 		return
